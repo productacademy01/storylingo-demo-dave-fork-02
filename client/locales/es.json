@@ -70,7 +70,18 @@
     },
     "little-mermaid": {
       "title": "La Sirenita",
-      "description": "Una princesa sirena sueña con la vida en tierra"
+      "description": "Una princesa sirena sueña con la vida en tierra",
+      "context": "En un reino bajo el mar, vivía una joven princesa sirena llamada Ariel, fascinada por el mundo sobre las olas. Coleccionaba tesoros humanos en su gruta secreta y soñaba con el día en que podría caminar en tierra. Su padre, el Rey Tritón, gobernaba el océano y prohibía todo contacto con el mundo de la superficie.",
+      "macroBeats": [
+        "Ariel vive bajo el mar y sueña con el mundo humano de arriba",
+        "Ariel rescata a un príncipe humano de un naufragio y se enamora de él",
+        "La bruja del mar Úrsula le ofrece a Ariel un trato: piernas a cambio de su voz",
+        "Ariel se convierte en humana pero no puede hablar; debe ganarse el amor del príncipe en tres días",
+        "Ariel y el príncipe pasan tiempo juntos y él comienza a enamorarse de ella",
+        "Úrsula engaña al príncipe usando la voz robada de Ariel",
+        "El hechizo se rompe y el engaño de Úrsula queda al descubierto; el príncipe ve la verdad",
+        "El Rey Tritón transforma a Ariel en humana permanentemente; Ariel y el príncipe viven felices para siempre"
+      ]
     },
     "sleeping-beauty": {
       "title": "La Bella Durmiente",

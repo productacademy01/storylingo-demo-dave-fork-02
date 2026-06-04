@@ -17,11 +17,6 @@ export interface ComingSoonStory {
 
 export const COMING_SOON_STORIES: ComingSoonStory[] = [
   {
-    id: "little-mermaid",
-    title: "The Little Mermaid",
-    description: "A mermaid princess dreams of life on land",
-  },
-  {
     id: "sleeping-beauty",
     title: "Sleeping Beauty",
     description: "A princess cursed to sleep for 100 years",
@@ -81,6 +76,23 @@ export const STORIES: Story[] = [
       "The prince searches for Rapunzel despite many challenges",
       "The prince finds Rapunzel; her tears of joy heal him",
       "Rapunzel and the prince return together; they live happily ever after",
+    ],
+  },
+  {
+    id: "little-mermaid",
+    title: "The Little Mermaid",
+    description: "A mermaid princess dreams of life on land",
+    context: "In a kingdom beneath the sea, there lived a young mermaid princess named Ariel who was fascinated by the world above the waves. She collected human treasures in her secret grotto and dreamed of the day she could walk on land. Her father, King Triton, ruled the ocean and forbade contact with the surface world.",
+    image: require("../../attached_assets/generated_images/little_mermaid_story_card.png"),
+    macroBeats: [
+      "Ariel lives under the sea and dreams of the human world above",
+      "Ariel rescues a human prince from a shipwreck and falls in love with him",
+      "The sea witch Ursula offers Ariel a deal: legs in exchange for her voice",
+      "Ariel becomes human but cannot speak; she must win the prince's love in three days",
+      "Ariel and the prince spend time together and he begins to fall for her",
+      "Ursula tricks the prince using Ariel's stolen voice",
+      "The spell is broken and Ursula's deception is revealed; the prince sees the truth",
+      "King Triton transforms Ariel into a human permanently; Ariel and the prince live happily ever after",
     ],
   },
   {
