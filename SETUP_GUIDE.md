@@ -178,29 +178,20 @@ Your key will look something like: `sk-proj-abc123xyz...`
 
 > **Important:** This key is like a password. Don't share it, don't paste it in public chats, and don't commit it to GitHub. Anyone with your key can use your OpenAI credits.
 
-### Verify Realtime API access
-
-The app uses OpenAI's **Realtime API** for voice conversations. This is a newer feature and your account needs access to it.
-
-1. Go to [platform.openai.com/settings/organization/limits](https://platform.openai.com/settings/organization/limits)
-2. Look for `gpt-realtime` or `gpt-4o-realtime` in the model list
-3. If you see it, you're good. If not, you may need to add more credit or wait for access to be enabled on your account
-
 ### Create your stored prompt
 
-The "stored prompt" is a set of instructions saved in your OpenAI account that tells the AI how to behave as a storyteller. The app references this prompt by its ID.
+The "stored prompt" is a set of system instructions saved in your OpenAI account that tells the voice AI how to behave as a storyteller. The app references this prompt by its ID.
 
-1. Go to [platform.openai.com/prompts](https://platform.openai.com/prompts)
-2. Click **Create prompt**
-3. Open the file `prompts/storyteller.md` in the repo you just cloned — you can find it in your code editor or [view it on GitHub](https://github.com/deewang/storylingo-demo/blob/main/prompts/storyteller.md)
-4. Copy everything in the **Prompt Template** section (the part inside the code block)
-5. Paste it into the OpenAI prompt editor
-6. Make sure the editor recognises the three template variables:
-   - `{{story_title}}`
-   - `{{story_context}}`
-   - `{{story_beats}}`
+This lives in the **Realtime Audio** section of the OpenAI platform — not the regular Prompts page.
+
+1. Go to [platform.openai.com/audio/realtime](https://platform.openai.com/audio/realtime)
+2. Click **Create** to start a new agent
+3. Give it a name like "StoryLingo Prompt"
+4. Open the file `prompts/storyteller.md` in the repo you just cloned — you can find it in your code editor or [view it on GitHub](https://github.com/deewang/storylingo-demo/blob/main/prompts/storyteller.md)
+5. Copy everything inside the **Prompt Template** section (the text inside the code block)
+6. Paste it into the **System instructions** field in the OpenAI editor
 7. Click **Save**
-8. Copy the **Prompt ID** — it starts with `pmpt_` (e.g., `pmpt_abc123def456...`)
+8. Copy the **Prompt ID** — it's shown at the top of the page and starts with `pmpt_` (e.g., `pmpt_abc123def456...`)
 
 Save this Prompt ID alongside your API key. You'll need both in the next steps.
 

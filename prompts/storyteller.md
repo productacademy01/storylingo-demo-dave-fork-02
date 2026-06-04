@@ -4,12 +4,11 @@ This is the stored prompt you need to create in your OpenAI account for the app 
 
 ## Setup Instructions
 
-1. Go to [platform.openai.com/prompts](https://platform.openai.com/prompts)
-2. Click **Create prompt**
-3. Copy the entire prompt template below and paste it in
-4. Make sure the three variables (`{{story_title}}`, `{{story_context}}`, `{{story_beats}}`) are recognised as template variables
-5. Save the prompt
-6. Copy the **Prompt ID** (starts with `pmpt_`) and set it as `OPENAI_PROMPT_ID` in your environment variables
+1. Go to [platform.openai.com/audio/realtime](https://platform.openai.com/audio/realtime)
+2. Click **Create** to start a new agent and give it a name like "StoryLingo Prompt"
+3. Copy the entire prompt template below and paste it into the **System instructions** field
+4. Click **Save**
+5. Copy the **Prompt ID** (shown at the top of the page, starts with `pmpt_`) and set it as `OPENAI_PROMPT_ID` in your environment variables
 
 ## Prompt Template
 
