@@ -118,6 +118,8 @@ export default function SessionScreen() {
   const [isMuted, setIsMuted] = useState(true);
   const [isHolding, setIsHolding] = useState(false); // true while child holds the mic button
   const [isPaused, setIsPaused] = useState(false);
+  const [currentAICaption, setCurrentAICaption] = useState("");
+  const [captionTranslation, setCaptionTranslation] = useState("");
   const [displayRemainingSeconds, setDisplayRemainingSeconds] = useState(
     Math.max(0, dailyLimitSeconds - dailyListenTimeSeconds)
   );
@@ -349,8 +351,10 @@ export default function SessionScreen() {
           const data = JSON.parse(msgEvent.data);
           console.log("OpenAI event:", data.type);
 
-          if (data.type === "response.audio_transcript.delta") {
+          if (data.type === "response.output_audio_transcript.delta") {
             currentAITextRef.current += data.delta || '';
+            setCurrentAICaption(currentAITextRef.current);
+            setCaptionTranslation("");
             setStatus("speaking");
             if (localStreamRef.current) {
               localStreamRef.current.getAudioTracks().forEach(t => { t.enabled = false; });
@@ -364,7 +368,7 @@ export default function SessionScreen() {
               }));
               dataChannelRef.current.send(JSON.stringify({ type: "input_audio_buffer.clear" }));
             }
-          } else if (data.type === "response.audio.delta") {
+          } else if (data.type === "response.output_audio.delta") {
             setStatus("speaking");
             if (localStreamRef.current) {
               localStreamRef.current.getAudioTracks().forEach(t => { t.enabled = false; });
@@ -385,6 +389,18 @@ export default function SessionScreen() {
                 text: currentAITextRef.current.trim(),
                 timestamp: Date.now(),
               });
+              if (language === "es") {
+                const completedText = currentAITextRef.current.trim();
+                const baseUrl = getApiUrl();
+                fetch(new URL("/api/translate", baseUrl).toString(), {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ texts: [completedText] }),
+                })
+                  .then((r) => r.json())
+                  .then((d) => { if (d.translations?.[0]) setCaptionTranslation(d.translations[0]); })
+                  .catch(() => {});
+              }
               currentAITextRef.current = '';
             }
             setStatus("listening");
@@ -648,6 +664,8 @@ export default function SessionScreen() {
     setStatus("idle");
     setIsMuted(false);
     setIsPaused(false);
+    setCurrentAICaption("");
+    setCaptionTranslation("");
     dataChannelRef.current = null;
     stopPulseAnimation();
   };
@@ -884,6 +902,15 @@ export default function SessionScreen() {
                     )}
                   </Pressable>
                 </View>
+
+                {currentAICaption ? (
+                  <View style={styles.captionBox}>
+                    <Text style={styles.captionTextES}>{currentAICaption}</Text>
+                    {captionTranslation ? (
+                      <Text style={styles.captionTextEN}>{captionTranslation}</Text>
+                    ) : null}
+                  </View>
+                ) : null}
 
                 <View style={styles.controlsContainer}>
                   <Pressable
@@ -1147,6 +1174,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "rgba(255,255,255,0.8)",
     textAlign: "center",
+  },
+  captionBox: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.xs,
+    width: "100%",
+  },
+  captionTextES: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  captionTextEN: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: "rgba(255,255,255,0.55)",
+    textAlign: "center",
+    fontStyle: "italic",
   },
   countdownBadge: {
     flexDirection: "row",

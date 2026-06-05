@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Pressable,
   Text,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -19,15 +20,19 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius, StoryBuddyColors, Typography } from "@/constants/theme";
 import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 import type { ConversationMessage } from "@/context/ProgressContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { getApiUrl } from "@/lib/query-client";
 
 function ChatBubble({
   message,
   storyImage,
   index,
+  translation,
 }: {
   message: ConversationMessage;
   storyImage: any;
   index: number;
+  translation?: string;
 }) {
   const isAI = message.role === "ai";
 
@@ -48,6 +53,9 @@ function ChatBubble({
         <Text style={[styles.bubbleText, isAI ? styles.bubbleTextAI : styles.bubbleTextUser]}>
           {message.text}
         </Text>
+        {translation && (
+          <Text style={styles.bubbleTranslation}>{translation}</Text>
+        )}
       </View>
     </Animated.View>
   );
@@ -59,6 +67,37 @@ export default function ConversationReviewScreen() {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "ConversationReview">>();
   const { story, transcript } = route.params;
+  const { language } = useLanguage();
+  const [translations, setTranslations] = useState<Record<number, string>>({});
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  useEffect(() => {
+    if (language !== "es") return;
+    const aiMessages = transcript
+      .map((m, i) => ({ index: i, text: m.text }))
+      .filter((m) => transcript[m.index].role === "ai");
+    if (aiMessages.length === 0) return;
+
+    setIsTranslating(true);
+    const baseUrl = getApiUrl();
+    fetch(new URL("/api/translate", baseUrl).toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texts: aiMessages.map((m) => m.text) }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.translations) {
+          const map: Record<number, string> = {};
+          aiMessages.forEach((m, i) => {
+            map[m.index] = data.translations[i];
+          });
+          setTranslations(map);
+        }
+      })
+      .catch((e) => console.error("Translation fetch failed:", e))
+      .finally(() => setIsTranslating(false));
+  }, [language, transcript]);
 
   const handleContinue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -76,6 +115,12 @@ export default function ConversationReviewScreen() {
         <Animated.View entering={FadeInUp.springify()}>
           <ThemedText style={styles.headerTitle}>Review your conversation</ThemedText>
           <ThemedText style={styles.headerSubtitle}>{story.title}</ThemedText>
+          {isTranslating && (
+            <View style={styles.translatingRow}>
+              <ActivityIndicator size="small" color="rgba(255,255,255,0.5)" />
+              <ThemedText style={styles.translatingText}>Loading translations…</ThemedText>
+            </View>
+          )}
         </Animated.View>
       </View>
 
@@ -100,6 +145,7 @@ export default function ConversationReviewScreen() {
               message={message}
               storyImage={story.image}
               index={index}
+              translation={translations[index]}
             />
           ))}
         </ScrollView>
@@ -207,6 +253,24 @@ const styles = StyleSheet.create({
   },
   bubbleTextUser: {
     color: "#FFFFFF",
+  },
+  bubbleTranslation: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: "rgba(255,255,255,0.55)",
+    marginTop: Spacing.xs,
+    fontStyle: "italic",
+  },
+  translatingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  translatingText: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.5)",
   },
   bottomBar: {
     position: "absolute",
