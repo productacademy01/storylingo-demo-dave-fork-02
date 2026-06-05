@@ -122,6 +122,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/translate - Translate an array of texts to English using OpenAI
+  app.post("/api/translate", async (req, res) => {
+    try {
+      const { texts } = req.body;
+      if (!Array.isArray(texts) || texts.length === 0) {
+        return res.status(400).json({ error: "texts must be a non-empty array" });
+      }
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a translator. The user will send a JSON array of Spanish strings. Return ONLY a JSON array of their English translations, in the same order, with no extra text.",
+            },
+            {
+              role: "user",
+              content: JSON.stringify(texts),
+            },
+          ],
+          temperature: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        return res.status(response.status).json({ error: errorText });
+      }
+
+      const data = await response.json();
+      const raw = data.choices[0].message.content.trim();
+      const translations = JSON.parse(raw);
+      res.json({ translations });
+    } catch (error) {
+      console.error("Translation error:", error);
+      res.status(500).json({ error: "Failed to translate" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

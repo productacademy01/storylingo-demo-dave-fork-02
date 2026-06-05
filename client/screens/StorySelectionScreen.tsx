@@ -101,7 +101,15 @@ export default function StorySelectionScreen() {
       navigation.navigate("Paywall", { fromTrialPrompt: false });
       return;
     }
-    navigation.navigate("Session", { story });
+    const storyTranslation = getStoryTranslation(t, story.id);
+    const localizedStory: Story = {
+      ...story,
+      title: storyTranslation?.title ?? story.title,
+      description: storyTranslation?.description ?? story.description,
+      context: storyTranslation?.context ?? story.context,
+      macroBeats: storyTranslation?.macroBeats ?? story.macroBeats,
+    };
+    navigation.navigate("Session", { story: localizedStory });
   };
 
   const handleOpenSettings = () => {
